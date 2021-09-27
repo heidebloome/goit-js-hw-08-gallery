@@ -87,3 +87,28 @@ const galleryItems = [
 Закрытие модального окна по нажатию клавиши ESC.
 Пролистывание изображений галереи в открытом модальном окне клавишами "влево" и "вправо".
 */
+
+const galleryEl = document.querySelector('.js-gallery');
+const modalWindow = document.querySelector('.js-lightbox');
+const modalPictureEl = document.querySelector('.lightbox__image');
+const closeBtnEl = document.querySelector('[data-action="close-lightbox"]');
+
+const createMarkUp = ({ original, preview, description }) => {
+  return `<li class="gallery__item"><a class="gallery__link" href=${original}><img class="gallery__image" src=${preview} data-source=${original} alt=${description}/></a></li>`;
+};
+
+const markUp = galleryItems.map(createMarkUp).join('');
+galleryEl.insertAdjacentHTML('beforeend', markUp);
+
+galleryEl.addEventListener('click', event => {
+  event.preventDefault();
+  modalPictureEl.src = event.target.dataset.source;
+  modalPictureEl.alt = event.target.alt;
+  modalWindow.classList.add('is-open');
+
+  closeBtnEl.addEventListener('click', () => {
+    modalPictureEl.src = '';
+    modalPictureEl.alt = '';
+    modalWindow.classList.remove('is-open');
+  });
+});
