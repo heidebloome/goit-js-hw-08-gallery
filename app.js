@@ -52,12 +52,12 @@ const galleryItems = [
 
 Разбей задание на несколько подзадач:
 
-Создание и рендер разметки по массиву данных galleryItems из app.js и предоставленному шаблону.
++Создание и рендер разметки по массиву данных galleryItems из app.js и предоставленному шаблону.
 Реализация делегирования на галерее ul.js-gallery и получение url большого изображения.
-Открытие модального окна по клику на элементе галереи.
-Подмена значения атрибута src элемента img.lightbox__image.
-Закрытие модального окна по клику на кнопку button[data-action="close-lightbox"].
-Очистка значения атрибута src элемента img.lightbox__image. Это необходимо для того, чтобы при следующем открытии модального окна, пока грузится изображение, мы не видели предыдущее.
++Открытие модального окна по клику на элементе галереи.
++Подмена значения атрибута src элемента img.lightbox__image.
++Закрытие модального окна по клику на кнопку button[data-action="close-lightbox"].
++Очистка значения атрибута src элемента img.lightbox__image. Это необходимо для того, чтобы при следующем открытии модального окна, пока грузится изображение, мы не видели предыдущее.
 
 Стартовые файлы
 В папке src ты найдешь стартовые файлы проекта с базовой разметкой и готовыми стилями.
@@ -89,9 +89,10 @@ const galleryItems = [
 */
 
 const galleryEl = document.querySelector('.js-gallery');
-const modalWindow = document.querySelector('.js-lightbox');
+const modalWindowEl = document.querySelector('.js-lightbox');
 const modalPictureEl = document.querySelector('.lightbox__image');
 const closeBtnEl = document.querySelector('[data-action="close-lightbox"]');
+const overlayEl = document.querySelector('.lightbox__overlay');
 
 const createMarkUp = ({ original, preview, description }) => {
   return `<li class="gallery__item"><a class="gallery__link" href=${original}><img class="gallery__image" src=${preview} data-source=${original} alt=${description}/></a></li>`;
@@ -100,15 +101,34 @@ const createMarkUp = ({ original, preview, description }) => {
 const markUp = galleryItems.map(createMarkUp).join('');
 galleryEl.insertAdjacentHTML('beforeend', markUp);
 
+const onCloseModalWindow = function () {
+  modalPictureEl.src = '';
+  modalPictureEl.alt = '';
+  modalWindowEl.classList.remove('is-open');
+};
+
 galleryEl.addEventListener('click', event => {
   event.preventDefault();
+
   modalPictureEl.src = event.target.dataset.source;
   modalPictureEl.alt = event.target.alt;
-  modalWindow.classList.add('is-open');
+  modalWindowEl.classList.add('is-open');
 
-  closeBtnEl.addEventListener('click', () => {
-    modalPictureEl.src = '';
-    modalPictureEl.alt = '';
-    modalWindow.classList.remove('is-open');
-  });
+  closeBtnEl.addEventListener(
+    'click',
+    () => {
+      onCloseModalWindow();
+    },
+    { once: true },
+  );
+
+  overlayEl.addEventListener(
+    'click',
+    event => {
+      if (event.target === event.currentTarget) {
+        onCloseModalWindow();
+      }
+    },
+    { once: true },
+  );
 });
