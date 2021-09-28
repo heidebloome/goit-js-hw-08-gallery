@@ -105,6 +105,8 @@ const onCloseModalWindow = function () {
   modalPictureEl.src = '';
   modalPictureEl.alt = '';
   modalWindowEl.classList.remove('is-open');
+  closeBtnEl.removeEventListener('click', onCloseModalWindow);
+  overlayEl.removeEventListener('click', onCloseModalWindow);
 };
 
 galleryEl.addEventListener('click', event => {
@@ -114,21 +116,6 @@ galleryEl.addEventListener('click', event => {
   modalPictureEl.alt = event.target.alt;
   modalWindowEl.classList.add('is-open');
 
-  closeBtnEl.addEventListener(
-    'click',
-    () => {
-      onCloseModalWindow();
-    },
-    { once: true },
-  );
-
-  overlayEl.addEventListener(
-    'click',
-    event => {
-      if (event.target === event.currentTarget) {
-        onCloseModalWindow();
-      }
-    },
-    { once: true },
-  );
+  closeBtnEl.addEventListener('click', onCloseModalWindow);
+  overlayEl.addEventListener('click', onCloseModalWindow);
 });
