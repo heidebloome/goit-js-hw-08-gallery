@@ -83,10 +83,12 @@ const galleryItems = [
 Дополнительно
 Следующий функционал не обязателен при сдаче задания, но будет хорошей практикой по работе с событиями.
 
-Закрытие модального окна по клику на div.lightbox__overlay.
-Закрытие модального окна по нажатию клавиши ESC.
++Закрытие модального окна по клику на div.lightbox__overlay.
++Закрытие модального окна по нажатию клавиши ESC.
 Пролистывание изображений галереи в открытом модальном окне клавишами "влево" и "вправо".
 */
+
+//refs
 
 const galleryEl = document.querySelector('.js-gallery');
 const modalWindowEl = document.querySelector('.js-lightbox');
@@ -94,20 +96,63 @@ const modalPictureEl = document.querySelector('.lightbox__image');
 const closeBtnEl = document.querySelector('[data-action="close-lightbox"]');
 const overlayEl = document.querySelector('.lightbox__overlay');
 
+// callback functions
+
 const createMarkUp = ({ original, preview, description }) => {
   return `<li class="gallery__item"><a class="gallery__link" href=${original}><img class="gallery__image" src=${preview} data-source=${original} alt=${description}/></a></li>`;
 };
 
-const markUp = galleryItems.map(createMarkUp).join('');
-galleryEl.insertAdjacentHTML('beforeend', markUp);
-
-const onCloseModalWindow = function () {
+const closeModalWindowHandler = () => {
   modalPictureEl.src = '';
   modalPictureEl.alt = '';
   modalWindowEl.classList.remove('is-open');
-  closeBtnEl.removeEventListener('click', onCloseModalWindow);
-  overlayEl.removeEventListener('click', onCloseModalWindow);
+
+  closeBtnEl.removeEventListener('click', closeModalWindowHandler);
+  overlayEl.removeEventListener('click', closeModalWindowHandler);
+  window.removeEventListener('keydown', escapeKeyPressHandler);
+  window.removeEventListener('keydown', arrowKeysPressHandler);
 };
+
+const escapeKeyPressHandler = event => {
+  if (event.code === 'Escape') {
+    closeModalWindowHandler();
+  }
+};
+
+const arrowKeysPressHandler = event => {
+  const currentIndex = galleryItems.findIndex(image => image.original === modalPictureEl.src);
+
+  if (event.code === 'ArrowLeft') {
+    onLeftArrowClick(currentIndex);
+  } else if (event.code === 'ArrowRight') {
+    onRightArrowClick(currentIndex);
+  }
+};
+
+const onLeftArrowClick = currentIndex => {
+  let nextIndex = currentIndex - 1;
+  if (nextIndex === -1) {
+    nextIndex = galleryItems.length - 1;
+  }
+  modalPictureEl.src = galleryItems[nextIndex].original;
+  modalPictureEl.alt = galleryItems[nextIndex].description;
+};
+
+const onRightArrowClick = currentIndex => {
+  let nextIndex = currentIndex + 1;
+  if (nextIndex === galleryItems.length) {
+    nextIndex = 0;
+  }
+  modalPictureEl.src = galleryItems[nextIndex].original;
+  modalPictureEl.alt = galleryItems[nextIndex].description;
+};
+
+// create markUp
+
+const markUp = galleryItems.map(createMarkUp).join('');
+galleryEl.insertAdjacentHTML('beforeend', markUp);
+
+// add eventListeners
 
 galleryEl.addEventListener('click', event => {
   event.preventDefault();
@@ -116,6 +161,8 @@ galleryEl.addEventListener('click', event => {
   modalPictureEl.alt = event.target.alt;
   modalWindowEl.classList.add('is-open');
 
-  closeBtnEl.addEventListener('click', onCloseModalWindow);
-  overlayEl.addEventListener('click', onCloseModalWindow);
+  closeBtnEl.addEventListener('click', closeModalWindowHandler);
+  overlayEl.addEventListener('click', closeModalWindowHandler);
+  window.addEventListener('keydown', escapeKeyPressHandler);
+  window.addEventListener('keydown', arrowKeysPressHandler);
 });
