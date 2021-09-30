@@ -157,6 +157,8 @@ galleryEl.insertAdjacentHTML('beforeend', markUp);
 galleryEl.addEventListener('click', event => {
   event.preventDefault();
 
+  if (event.target === event.currentTarget) return;
+
   modalPictureEl.src = event.target.dataset.source;
   modalPictureEl.alt = event.target.alt;
   modalWindowEl.classList.add('is-open');
